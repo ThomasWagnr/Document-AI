@@ -48,3 +48,24 @@ def embed_doc_text(text: str) -> List[float]:
 def embed_query_text(text: str) -> List[float]:
     return _embed(text, "RETRIEVAL_QUERY")
 
+
+def answer_with_context(query: str, context_chunks: list[str]) -> str:
+    context_block = "\n\n---\n".join(context_chunks)
+
+    instruction = (
+        "You are a concise documentation assistant. Answer strictly from the provided context. "
+        "If the answer is not in the context, reply exactly: \"I don't know.\""
+    )
+
+    content = f"Context:\n{context_block}\n\nQuestion: {query}"
+    
+
+    resp = client.models.generate_content(
+        model=CHAT_MODEL,
+        contents=content,
+        config=types.GenerateContentConfig(
+            system_instruction=instruction,
+            temperature=0.1,
+        ),
+    )
+    return resp.text.strip()
