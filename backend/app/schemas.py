@@ -1,12 +1,12 @@
 from typing import List
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
+
 
 # ---------- Base models ----------
 
-
 class DocumentBase(BaseModel):
     name: str
-    source: str
+    source: str | None = None
 
 class ChunkBase(BaseModel):
     id: int
@@ -18,7 +18,7 @@ class ChunkBase(BaseModel):
 
 class IngestRequest(BaseModel):
     name: str
-    source: str
+    source: str | None = None
     text: str
 
 
@@ -30,10 +30,11 @@ class QARequest(BaseModel):
     query: str
     k: int = 5
 
+
 # ---------- Responses ----------
 
 class ChunkOut(ChunkBase):
-    pass
+    model_config = ConfigDict(from_attributes=True)
 
 
 class QAResponse(BaseModel):

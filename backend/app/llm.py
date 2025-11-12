@@ -57,8 +57,8 @@ def answer_with_context(query: str, context_chunks: list[str]) -> str:
         "If the answer is not in the context, reply exactly: \"I don't know.\""
     )
 
-    content = f"Context:\n{context_block}\n\nQuestion: {query}"
-    
+    content = f"Context:\n{context_block}\n\nQuestion: {query}\n\nAnswer:"
+
 
     resp = client.models.generate_content(
         model=CHAT_MODEL,
