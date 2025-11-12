@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import select
 
 from . import models
-from .llm import embed_text
+from .llm import embed_doc_text, embed_query_text
 
 CHUNK_SIZE = 256
 CHUNK_OVERLAP = 32
@@ -27,18 +27,20 @@ def store_document(db: Session, name: str, text: str, source: str = "upload") ->
     words = text.split()
     chunks = []
     step = CHUNK_SIZE - CHUNK_OVERLAP
+
     for i in range(0, len(words), step):
         chunk_text =  " ".join(words[i:i+CHUNK_SIZE]).strip()
         if not chunk_text:
             continue
 
-        emb = embed_text(chunk_text)
+        emb = embed_doc_text(chunk_text)
 
 
         chunk = models.Chunk(document_id=doc.id, content=chunk_text, embedding=emb)
         chunks.append(chunk)
     
-    db.add_all(chunks)
+    if chunks:
+        db.add_all(chunks)
     db.commit()
     db.refresh(doc)
     return doc
@@ -46,7 +48,7 @@ def store_document(db: Session, name: str, text: str, source: str = "upload") ->
 
 def search_chunks(db: Session, query: str, k: int = 5) -> list[models.Chunk]:
     """
-    Search: Embed the query, retrieve the most similar chunks, return the context.
+    Retrieval: Embed the query, retrieve the k most similar chunks, return the context.
 
     Args:
         db: The database session
@@ -56,8 +58,12 @@ def search_chunks(db: Session, query: str, k: int = 5) -> list[models.Chunk]:
     Returns:
         The k most similar chunks
     """
-    q_emb = embed_text(query)
-    stmt = select(models.Chunk).order_by(models.Chunk.embedding.l2_distance(q_emb)).limit(k)
+    q_emb = embed_query_text(query)
 
-    chunks = db.execute(stmt).scalars().all()
-    return chunks
+    stmt = (
+        select(models.Chunk)
+        .order_by(models.Chunk.embedding.l2_distance(q_emb))
+        .limit(k) 
+    )
+
+    return db.execute(stmt).scalars().all()
