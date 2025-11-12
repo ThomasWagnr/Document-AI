@@ -1,18 +1,21 @@
 from fastapi import FastAPI, Depends
+from contextlib import asynccontextmanager
 from sqlalchemy import text
 from sqlalchemy.orm import Session
-from typing import Union
-from .db import engine, Base, get_db
+from .models import Base
+from .db import engine, get_db
 from . import schemas, rag
+from .llm import answer_with_context
 
-app = FastAPI(title="AI Docs Assistant")
-
-def init_db():
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Ensure pgvector and schema exist before serving requests
     with engine.begin() as conn:
         conn.execute(text("CREATE EXTENSION IF NOT EXISTS vector"))
         Base.metadata.create_all(bind=conn)
+    yield
 
-init_db()
+app = FastAPI(title="AI Docs Assistant", lifespan=lifespan)
 
 @app.post("/ingest")
 def ingest(req: schemas.IngestRequest, db: Session = Depends(get_db)):
@@ -21,5 +24,10 @@ def ingest(req: schemas.IngestRequest, db: Session = Depends(get_db)):
 
 @app.post("/search", response_model=list[schemas.ChunkOut])
 def search(req: schemas.SearchRequest, db: Session = Depends(get_db)):
+    return rag.search_chunks(db, req.query, req.k)
+
+@app.post("/ask", response_model=schemas.QAResponse)
+def ask(req: schemas.QARequest, db: Session = Depends(get_db)):
     chunks = rag.search_chunks(db, req.query, req.k)
-    return chunks
+    answer = answer_with_context(req.query, [c.content for c in chunks])
+    return schemas.QAResponse(answer=answer, context=chunks)
