@@ -7,7 +7,7 @@ from .llm import embed_text
 CHUNK_SIZE = 256
 CHUNK_OVERLAP = 32
 
-def store_document(db: Session, name: str, text: str, source: str) -> models.Document:
+def store_document(db: Session, name: str, text: str, source: str = "upload") -> models.Document:
     """
     Ingestion: Chunk the document, embed the chunks, store in the database.
     

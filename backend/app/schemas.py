@@ -19,6 +19,7 @@ class ChunkBase(BaseModel):
 class IngestRequest(BaseModel):
     name: str
     source: str
+    text: str
 
 
 class SearchRequest(BaseModel):
