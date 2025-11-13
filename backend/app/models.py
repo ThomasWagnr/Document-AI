@@ -18,7 +18,11 @@ class Document(Base):
     name: Mapped[Optional[str]] = mapped_column(String, index=True)
     source: Mapped[Optional[str]] = mapped_column(String, index=True)
 
-    chunks: Mapped[List["Chunk"]] = relationship(back_populates="document")
+    chunks: Mapped[List["Chunk"]] = relationship(
+        back_populates="document",
+        cascade="all, delete-orphan",  # ORM-level cascade
+        passive_deletes=True,  # let DB handle ON DELETE CASCADE
+    )
 
 
 class Chunk(Base):
@@ -26,10 +30,12 @@ class Chunk(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     document_id: Mapped[Optional[int]] = mapped_column(
-        ForeignKey("documents.id"), index=True
+        ForeignKey("documents.id", ondelete="CASCADE"), index=True
     )
     content: Mapped[str] = mapped_column(Text, nullable=False)
-    embedding: Mapped[list[float]] = mapped_column(
-        Vector(EMBEDDING_DIM), nullable=False
-    )
+    embedding: Mapped[list[float]] = mapped_column(Vector(EMBEDDING_DIM), nullable=False)
     document: Mapped[Optional["Document"]] = relationship(back_populates="chunks")
+
+    @property
+    def document_name(self) -> Optional[str]:
+        return self.document.name if self.document else None
