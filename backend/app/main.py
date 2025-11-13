@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI, Depends, UploadFile, File
 from contextlib import asynccontextmanager
 from sqlalchemy import text
 from sqlalchemy.orm import Session
@@ -17,9 +17,10 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="AI Docs Assistant", lifespan=lifespan)
 
-@app.post("/ingest")
-def ingest(req: schemas.IngestRequest, db: Session = Depends(get_db)):
-    doc = rag.store_document(db, req.name, req.text)
+@app.post("/ingest_pdf")
+async def ingest_pdf(file: UploadFile = File(...), db: Session = Depends(get_db)):
+    data = await file.read()
+    doc = rag.store_pdf(db, name=file.filename, data=data, source="upload")
     return {"id": doc.id, "name": doc.name}
 
 @app.post("/search", response_model=list[schemas.ChunkOut])
