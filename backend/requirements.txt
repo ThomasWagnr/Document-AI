@@ -9,3 +9,5 @@ openai
 numpy
 pgvector
 google-genai
+pymupdf           
+python-multipart
