@@ -1,0 +1,54 @@
+# --- macOS / editors
+.DS_Store
+.vscode/
+
+# --- Environment files (keep only templates in Git)
+.env
+.env.*
+!.env.example
+
+# --- Docker (keep compose.yaml, ignore transient stuff)
+docker-compose.override.yml
+*.local.yml
+
+# ---------- Python backend ----------
+backend/.env
+backend/.venv/
+backend/env/
+backend/venv/
+backend/**/__pycache__/
+backend/**/*.py[cod]
+backend/.mypy_cache/
+backend/.pytest_cache/
+backend/*.egg-info/
+backend/dist/
+backend/build/
+backend/.coverage
+
+# ---------- Next.js frontend ----------
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+frontend/.turbo/
+frontend/.vercel/
+frontend/.swc/
+frontend/.npm/
+frontend/.eslintcache
+frontend/.stylelintcache
+frontend/.pnp.*
+frontend/.yarn/*
+!frontend/.yarn/patches
+!frontend/.yarn/plugins
+!frontend/.yarn/releases
+!frontend/.yarn/sdks
+!frontend/.yarn/versions
+# pnpm store (occasionally created locally)
+**/.pnpm-store/
+
+# Logs (both sides)
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*

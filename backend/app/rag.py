@@ -74,7 +74,7 @@ def store_pdf(db: Session, name: str, data: bytes, source: str = "upload") -> mo
 
 # --------- Retrieval ---------
 
-def search_chunks(db: Session, query: str, k: int = 5) -> list[models.Chunk]:
+def search_chunks(db: Session, query: str, k: int = 3) -> list[models.Chunk]:
     """
     Embed query (RETRIEVAL_QUERY) and return top-k chunks by vector distance.
     """
