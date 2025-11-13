@@ -60,8 +60,7 @@ def store_pdf(db: Session, name: str, data: bytes, source: str = "upload") -> mo
             emb = embed_doc_text(text_with_title)
             rows.append(
                 models.Chunk(
-                    document_id=doc.id,
-                    page=None,               
+                    document_id=doc.id,              
                     content=text_with_title,
                     embedding=emb,
                 )

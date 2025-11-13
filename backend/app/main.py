@@ -6,6 +6,9 @@ from .models import Base
 from .db import engine, get_db
 from . import schemas, rag
 from .llm import answer_with_context
+from dotenv import load_dotenv
+
+load_dotenv()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):

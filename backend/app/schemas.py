@@ -16,7 +16,6 @@ class QARequest(BaseModel):
 class ChunkOut(BaseModel):
     id: int
     document_id: int
-    page: int | None = None
     content: str
     model_config = ConfigDict(from_attributes=True)
 

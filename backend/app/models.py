@@ -28,7 +28,6 @@ class Chunk(Base):
     document_id: Mapped[Optional[int]] = mapped_column(
         ForeignKey("documents.id"), index=True
     )
-    page: Mapped[Optional[int]] = mapped_column(Integer, index=True)
     content: Mapped[str] = mapped_column(Text, nullable=False)
     embedding: Mapped[list[float]] = mapped_column(
         Vector(EMBEDDING_DIM), nullable=False
