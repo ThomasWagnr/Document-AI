@@ -61,6 +61,10 @@ def delete_document(document_id: int, db: Session = Depends(get_db)):
     if not doc:
         raise HTTPException(status_code=404, detail="Document not found")
 
+    # Delete all chunks associated with this document first
+    db.query(models.Chunk).filter(models.Chunk.document_id == document_id).delete()
+    
+    # Then delete the document
     db.delete(doc)
     db.commit()
 
